@@ -29,10 +29,11 @@ function App() {
       <h1>Fragments UI</h1>
       <section>
         <nav>
-          {user && (
+          {user ? 
             <button id="login" disabled>Login</button>
-          )}
+          :
           <button id="login" onClick={handleLoginClick}>Login</button>
+          }
         </nav>
       </section>
       {user && (
