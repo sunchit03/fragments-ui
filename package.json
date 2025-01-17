@@ -4,7 +4,10 @@
   "version": "0.0.1",
   "description": "Fragments UI testing web app",
   "dependencies": {
+    "@aws-amplify/ui-react": "^6.9.0",
+    "aws-amplify": "^6.12.1",
     "cra-template": "1.2.0",
+    "oidc-client-ts": "^3.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-scripts": "5.0.1"
