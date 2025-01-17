@@ -6,6 +6,7 @@
   "dependencies": {
     "@aws-amplify/ui-react": "^6.9.0",
     "aws-amplify": "^6.12.1",
+    "bamboo.css": "^1.4.0",
     "cra-template": "1.2.0",
     "oidc-client-ts": "^3.1.0",
     "react": "^19.0.0",
