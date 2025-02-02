@@ -10,8 +10,12 @@ function FragmentsAccordion({ user }) {
   useEffect(() => {
     const fetchFragments = async () => {
       const userFragments = await getUserFragments(user);
-      console.log(userFragments.fragments || []);
-      setFragmentIds(userFragments.fragments || []);
+
+      const fragmentIDs =
+        userFragments && Array.isArray(userFragments.fragments) ? userFragments.fragments : [];
+
+      console.log(fragmentIDs);
+      setFragmentIds(fragmentIDs);
     };
 
     if (user) {

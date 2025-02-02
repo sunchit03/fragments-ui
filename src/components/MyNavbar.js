@@ -3,13 +3,6 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 
 function MyNavbar({ auth, setView }) {
-  const signOutRedirect = () => {
-    const clientId = process.env.REACT_APP_AWS_COGNITO_CLIENT_ID;
-    const logoutUri = 'http://localhost:3000';
-    const cognitoDomain = process.env.REACT_APP_COGNITO_DOMAIN;
-    window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
-  };
-
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
