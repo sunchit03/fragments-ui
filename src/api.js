@@ -15,7 +15,10 @@ export async function getUserFragments(user) {
       // Generate headers with the proper Authorization bearer token to pass.
       // We are using the `authorizationHeaders()` helper method we defined
       // earlier, to automatically attach the user's ID token.
-      headers: user.authorizationHeaders(),
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.id_token}`,
+      },
     });
     if (!res.ok) {
       throw new Error(`${res.status} ${res.statusText}`);
@@ -25,5 +28,53 @@ export async function getUserFragments(user) {
     return data;
   } catch (err) {
     console.error('Unable to call GET /v1/fragment', { err });
+  }
+}
+
+export async function getFragmentData(user, fragmentId) {
+  console.log(`Requesting data for fragment with ID ${fragmentId}...`);
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${fragmentId}`, {
+      // Generate headers with the proper Authorization bearer token to pass.
+      // We are using the `authorizationHeaders()` helper method we defined
+      // earlier, to automatically attach the user's ID token.
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${user.id_token}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error(`${res.status} ${res.statusText}`);
+    }
+    const data = await res.text();
+    console.log(`Successfully got details for fragment with ID ${fragmentId}`, { data });
+    return data;
+  } catch (err) {
+    console.error(`Unable to call GET /v1/fragment/${fragmentId}`, { err });
+  }
+}
+
+export async function createNewFragment(user, fragmentData) {
+  console.log('Requesting user fragments data...');
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments`, {
+      // Generate headers with the proper Authorization bearer token to pass.
+      // We are using the `authorizationHeaders()` helper method we defined
+      // earlier, to automatically attach the user's ID token.
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${user.id_token}`,
+        'Content-Type': 'text/plain',
+      },
+      body: fragmentData,
+    });
+    if (!res.ok) {
+      throw new Error(`${res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    console.log(`Successfully created new fragment with ID ${data.id}`, { data });
+    //return data;
+  } catch (err) {
+    console.error(`Unable to call POST /v1/fragment`, { err });
   }
 }

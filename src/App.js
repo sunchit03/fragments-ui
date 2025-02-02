@@ -1,51 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { signIn, getUser } from './auth';
-import { getUserFragments } from './api';
-import './App.css';
+// App.js
+
+import { useAuth } from 'react-oidc-context';
+import MyNavbar from './components/MyNavbar';
+import { useState } from 'react';
+import UserFragmentsAccordion from './components/FragmentsView';
+import CreateFragmentView from './components/CreateFragmentView';
 
 function App() {
+  const auth = useAuth();
 
-  const [user, setUser] = useState(null);
+  const [view, setView] = useState('homeView');
 
-  useEffect(() => {
-    async function init() {
-      // See if we're signed in (i.e., we'll have a `user` object)
-      const user = await getUser();
-      if (user) {
-        setUser(user);
-      }
-      // Do an authenticated request to the fragments API server and log the result
-      const userFragments = await getUserFragments(user);
-
-      // TODO: later in the course, we will show all the user's fragments in the HTML...
-    }
-
-    init();
-  }, [])
-
-  // Wire up event handlers to deal with login and logout.
-  const handleLoginClick = () => {
-    // Sign-in via the Amazon Cognito Hosted UI (requires redirects), see:
-    signIn();
+  // eslint-disable-next-line default-case
+  switch (auth.activeNavigator) {
+    case 'signinSilent':
+      return <div>Signing you in...</div>;
+    case 'signoutRedirect':
+      return <div>Signing you out...</div>;
   }
 
+  if (auth.isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (auth.error) {
+    return <div>Encountering error... {auth.error.message}</div>;
+  }
+
+  console.log(auth.user);
   return (
-     <div>
+    <div>
       <h1>Fragments UI</h1>
       <section>
-        <nav>
-          {user ? 
-            <button id="login" disabled>Login</button>
-          :
-          <button id="login" onClick={handleLoginClick}>Login</button>
-          }
-        </nav>
+        <MyNavbar auth={auth} setView={setView} />
       </section>
-      {user && (
+      {view === 'homeView' && (
         <section id="user">
           <h2>
-            Hello <span className="username">{user.username}</span>!
+            Hello <span className="username">{auth.user?.profile['cognito:username']}</span>!
           </h2>
+        </section>
+      )}
+      {view === 'fragmentsView' && (
+        <section id="fragmentsView">
+          <UserFragmentsAccordion user={auth.user} />
+        </section>
+      )}
+      {view === 'createFragmentsView' && (
+        <section id="fragmentsCreate">
+          <CreateFragmentView user={auth.user} />
         </section>
       )}
     </div>
