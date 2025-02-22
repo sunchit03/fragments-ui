@@ -1,27 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { Accordion, Spinner } from 'react-bootstrap';
 import { getUserFragments, getFragmentData } from '../api';
+import TabBar from './TabBar';
 
 function FragmentsAccordion({ user }) {
-  const [fragmentIds, setFragmentIds] = useState([]); // Holds only IDs
+  const [activeTab, setActiveTab] = useState('IDs');
+  const [fragments, setFragments] = useState([]); // Holds only IDs
   const [fragmentDetails, setFragmentDetails] = useState({}); // Holds full fragment data
   const [loadingFragments, setLoadingFragments] = useState({}); // Tracks loading state
 
   useEffect(() => {
     const fetchFragments = async () => {
-      const userFragments = await getUserFragments(user);
+      const userFragments = await getUserFragments(user, activeTab === 'Expanded');
 
-      const fragmentIDs =
-        userFragments && Array.isArray(userFragments.fragments) ? userFragments.fragments : [];
-
-      console.log(fragmentIDs);
-      setFragmentIds(fragmentIDs);
+      if (userFragments && Array.isArray(userFragments.fragments)) {
+        setFragments(userFragments.fragments);
+      } else {
+        setFragments([]);
+      }
     };
 
     if (user) {
       fetchFragments();
     }
-  }, [user]);
+  }, [user, activeTab]);
 
   // Function to fetch a fragment's details when the user opens the accordion
   const fetchFragmentDetails = async (id) => {
@@ -37,21 +39,30 @@ function FragmentsAccordion({ user }) {
   return (
     <div>
       <h2>Your Fragments</h2>
+      <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
+
       <Accordion>
-        {fragmentIds.map((id) => (
-          <Accordion.Item key={id} eventKey={id}>
-            <Accordion.Header onClick={() => fetchFragmentDetails(id)}>
-              Fragment ID: {id}
-            </Accordion.Header>
-            <Accordion.Body>
-              {loadingFragments[id] ? (
-                <Spinner animation="border" size="sm" />
-              ) : (
-                <div>{fragmentDetails[id] || 'Click to load fragment data'}</div>
-              )}
-            </Accordion.Body>
-          </Accordion.Item>
-        ))}
+        {fragments.map((fragment) => {
+          // Ensure we always extract the correct `id` (whether `fragments` is a list of strings or objects)
+          const fragmentId = typeof fragment === 'string' ? fragment : fragment.id;
+          return (
+            <Accordion.Item key={fragmentId} eventKey={fragmentId}>
+              <Accordion.Header onClick={() => fetchFragmentDetails(fragmentId)}>
+                Fragment ID: {fragmentId}
+              </Accordion.Header>
+              <Accordion.Body>
+                {loadingFragments[fragmentId] ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  <div>
+                    {activeTab === 'Expanded' && <pre>{JSON.stringify(fragment, null, 2)}</pre>}
+                    {fragmentDetails[fragmentId] || 'Click to load fragment data'}
+                  </div>
+                )}
+              </Accordion.Body>
+            </Accordion.Item>
+          );
+        })}
       </Accordion>
     </div>
   );
