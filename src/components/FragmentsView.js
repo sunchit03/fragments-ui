@@ -1,12 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Accordion, Spinner } from 'react-bootstrap';
-import { getUserFragments, getFragmentData } from '../api';
-import TabBar from './TabBar';
+import { Accordion, Spinner, Stack } from 'react-bootstrap';
+import { TfiTrash } from 'react-icons/tfi';
+import { GrFormView } from 'react-icons/gr';
+import toast, { Toaster } from 'react-hot-toast';
+import { getUserFragments, getFragmentInfo } from '../api';
+import DeleteFragmentView from './DeleteFragmentView';
+import EditFragmentView from './EditFragmentView';
 
 function FragmentsAccordion({ user }) {
   const [fragments, setFragments] = useState([]); // Holds only IDs
   const [fragmentDetails, setFragmentDetails] = useState({}); // Holds full fragment info
   const [loadingFragments, setLoadingFragments] = useState({}); // Tracks loading state
+  const [showDeleteModal, setShowDeleteModal] = useState({ show: false, fragmentId: null });
+  const [showEditModal, setShowEditModal] = useState({ show: false, fragmentId: null });
 
   const fetchFragments = async () => {
     const userFragments = await getUserFragments(user);
@@ -45,6 +51,13 @@ function FragmentsAccordion({ user }) {
     toast.success(`Fragment ${fragmentId} deleted successfully`);
   };
 
+  const editFragment = async (fragmentId, data) => {
+    //incomplete
+
+    setShowEditModal({ show: false, fragmentId: null });
+    toast.success(`Fragment ${fragmentId} edited successfully`);
+  };
+
   return (
     <div>
       <h2>Your Fragments</h2>
@@ -65,6 +78,15 @@ function FragmentsAccordion({ user }) {
                     gap={10}
                     style={{ justifyContent: 'space-between' }}
                   >
+                    <div
+                      className="p-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowEditModal({ show: true, fragmentId });
+                      }}
+                    >
+                      <GrFormView />
+                    </div>
                     <div
                       className="p-2"
                       onClick={(e) => {
@@ -91,6 +113,8 @@ function FragmentsAccordion({ user }) {
         })}
       </Accordion>
 
+      <Toaster position="bottom-center" />
+
       {showDeleteModal.show && (
         <DeleteFragmentView
           fragmentId={showDeleteModal.fragmentId}
@@ -99,6 +123,14 @@ function FragmentsAccordion({ user }) {
         />
       )}
 
+      {showEditModal.show && (
+        <EditFragmentView
+          user={user}
+          fragmentId={showEditModal.fragmentId}
+          setShowEditModal={setShowEditModal}
+          editFragment={editFragment}
+        />
+      )}
     </div>
   );
 }
