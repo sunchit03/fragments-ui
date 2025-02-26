@@ -1,0 +1,32 @@
+import { Button, Modal } from 'react-bootstrap';
+
+function DeleteFragmentView({ fragmentId, setShowDeleteModal, deleteFragment }) {
+  const handleFragmentDeletion = () => {
+    deleteFragment(fragmentId);
+  };
+
+  return (
+    <>
+      {/* Delete Modal */}
+      <Modal show={true} onHide={() => setShowDeleteModal({ show: false, fragmentId: null })}>
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Fragment</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>Are you sure you want to delete fragment: {fragmentId}?</Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="secondary"
+            onClick={() => setShowDeleteModal({ show: false, fragmentId: null })}
+          >
+            Close
+          </Button>
+          <Button variant="primary" onClick={() => handleFragmentDeletion(fragmentId)}>
+            Yes
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+
+export default DeleteFragmentView;
