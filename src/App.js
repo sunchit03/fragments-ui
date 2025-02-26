@@ -30,9 +30,8 @@ function App() {
   console.log(auth.user);
   return (
     <div>
-      <h1>Fragments UI</h1>
       <section>
-        <MyNavbar auth={auth} setView={setView} />
+        <MyNavbar auth={auth} view={view} setView={setView} />
       </section>
       {view === 'homeView' && (
         <section id="user">

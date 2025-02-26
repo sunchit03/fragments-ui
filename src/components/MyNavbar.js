@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 
-function MyNavbar({ auth, setView }) {
+function MyNavbar({ auth, view, setView }) {
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container>
@@ -12,9 +12,21 @@ function MyNavbar({ auth, setView }) {
           <Nav className="me-auto">
             {auth.isAuthenticated ? (
               <>
-                <Nav.Link onClick={() => setView('homeView')}>Home</Nav.Link>
-                <Nav.Link onClick={() => setView('fragmentsView')}>View Fragments</Nav.Link>
-                <Nav.Link onClick={() => setView('createFragmentsView')}>Create Fragments</Nav.Link>
+                <Nav.Link active={view === 'homeView'} onClick={() => setView('homeView')}>
+                  Home
+                </Nav.Link>
+                <Nav.Link
+                  active={view === 'fragmentsView'}
+                  onClick={() => setView('fragmentsView')}
+                >
+                  View Fragments
+                </Nav.Link>
+                <Nav.Link
+                  active={view === 'createFragmentsView'}
+                  onClick={() => setView('createFragmentsView')}
+                >
+                  Create Fragments
+                </Nav.Link>
                 <Nav.Link
                   onClick={() => {
                     void auth.removeUser();
