@@ -5,7 +5,7 @@ import TabBar from './TabBar';
 
 function FragmentsAccordion({ user }) {
   const [fragments, setFragments] = useState([]); // Holds only IDs
-  const [fragmentDetails, setFragmentDetails] = useState({}); // Holds full fragment data
+  const [fragmentDetails, setFragmentDetails] = useState({}); // Holds full fragment info
   const [loadingFragments, setLoadingFragments] = useState({}); // Tracks loading state
 
   const fetchFragments = async () => {
@@ -16,15 +16,15 @@ function FragmentsAccordion({ user }) {
     } else {
       setFragments([]);
     }
-  }, [user, activeTab]);
+  };
 
-  // Function to fetch a fragment's details when the user opens the accordion
-  const fetchFragmentDetails = async (id) => {
+  // Function to fetch a fragment's info when the user opens the accordion
+  const fetchFragmentInfo = async (id) => {
     if (!fragmentDetails[id] && !loadingFragments[id]) {
       setLoadingFragments((prev) => ({ ...prev, [id]: true }));
 
-      const fragmentData = await getFragmentData(user, id);
-      setFragmentDetails((prev) => ({ ...prev, [id]: fragmentData }));
+      const info = await getFragmentInfo(user, id);
+      setFragmentDetails((prev) => ({ ...prev, [id]: info.fragment }));
       setLoadingFragments((prev) => ({ ...prev, [id]: false }));
     }
   };
@@ -40,6 +40,7 @@ function FragmentsAccordion({ user }) {
       <h2>Your Fragments</h2>
 
       <Accordion>
+        {fragments.map((fragmentId) => {
           return (
             <Accordion.Item key={fragmentId} eventKey={fragmentId}>
               <Accordion.Header onClick={() => fetchFragmentDetails(fragmentId)}>
