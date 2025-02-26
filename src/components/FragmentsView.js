@@ -4,24 +4,17 @@ import { getUserFragments, getFragmentData } from '../api';
 import TabBar from './TabBar';
 
 function FragmentsAccordion({ user }) {
-  const [activeTab, setActiveTab] = useState('IDs');
   const [fragments, setFragments] = useState([]); // Holds only IDs
   const [fragmentDetails, setFragmentDetails] = useState({}); // Holds full fragment data
   const [loadingFragments, setLoadingFragments] = useState({}); // Tracks loading state
 
-  useEffect(() => {
-    const fetchFragments = async () => {
-      const userFragments = await getUserFragments(user, activeTab === 'Expanded');
+  const fetchFragments = async () => {
+    const userFragments = await getUserFragments(user);
 
-      if (userFragments && Array.isArray(userFragments.fragments)) {
-        setFragments(userFragments.fragments);
-      } else {
-        setFragments([]);
-      }
-    };
-
-    if (user) {
-      fetchFragments();
+    if (userFragments && Array.isArray(userFragments.fragments)) {
+      setFragments(userFragments.fragments);
+    } else {
+      setFragments([]);
     }
   }, [user, activeTab]);
 
@@ -36,15 +29,17 @@ function FragmentsAccordion({ user }) {
     }
   };
 
+  useEffect(() => {
+    if (user) {
+      fetchFragments();
+    }
+  }, []);
+
   return (
     <div>
       <h2>Your Fragments</h2>
-      <TabBar activeTab={activeTab} setActiveTab={setActiveTab} />
 
       <Accordion>
-        {fragments.map((fragment) => {
-          // Ensure we always extract the correct `id` (whether `fragments` is a list of strings or objects)
-          const fragmentId = typeof fragment === 'string' ? fragment : fragment.id;
           return (
             <Accordion.Item key={fragmentId} eventKey={fragmentId}>
               <Accordion.Header onClick={() => fetchFragmentDetails(fragmentId)}>
@@ -55,8 +50,7 @@ function FragmentsAccordion({ user }) {
                   <Spinner animation="border" size="sm" />
                 ) : (
                   <div>
-                    {activeTab === 'Expanded' && <pre>{JSON.stringify(fragment, null, 2)}</pre>}
-                    {fragmentDetails[fragmentId] || 'Click to load fragment data'}
+                    <pre>{JSON.stringify(fragmentDetails[fragmentId], null, 2)}</pre>
                   </div>
                 )}
               </Accordion.Body>
