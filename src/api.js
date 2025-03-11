@@ -16,7 +16,6 @@ export async function getUserFragments(user, expanded = false) {
       // We are using the `authorizationHeaders()` helper method we defined
       // earlier, to automatically attach the user's ID token.
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${user.id_token}`,
       },
     });
@@ -39,7 +38,6 @@ export async function getFragmentData(user, fragmentId) {
       // We are using the `authorizationHeaders()` helper method we defined
       // earlier, to automatically attach the user's ID token.
       headers: {
-        'Content-Type': 'application/json',
         Authorization: `Bearer ${user.id_token}`,
       },
     });
@@ -54,7 +52,29 @@ export async function getFragmentData(user, fragmentId) {
   }
 }
 
-export async function createNewFragment(user, fragmentData) {
+export async function getFragmentInfo(user, fragmentId) {
+  console.log(`Requesting info for fragment with ID ${fragmentId}...`);
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${fragmentId}/info`, {
+      // Generate headers with the proper Authorization bearer token to pass.
+      // We are using the `authorizationHeaders()` helper method we defined
+      // earlier, to automatically attach the user's ID token.
+      headers: {
+        Authorization: `Bearer ${user.id_token}`,
+      },
+    });
+    if (!res.ok) {
+      throw new Error(`${res.status} ${res.statusText}`);
+    }
+    const data = await res.json();
+    console.log(`Successfully got info for fragment with ID ${fragmentId}`, { data });
+    return data;
+  } catch (err) {
+    console.error(`Unable to call GET /v1/fragment/${fragmentId}/info`, { err });
+  }
+}
+
+export async function createNewFragment(user, fragmentData, contentType) {
   console.log('Requesting user fragments data...');
   try {
     const res = await fetch(`${apiUrl}/v1/fragments`, {
@@ -64,17 +84,19 @@ export async function createNewFragment(user, fragmentData) {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${user.id_token}`,
-        'Content-Type': 'text/plain',
+        'Content-Type': contentType,
       },
       body: fragmentData,
     });
-    if (!res.ok) {
-      throw new Error(`${res.status} ${res.statusText}`);
-    }
+    // if (!res.ok) {
+    //   throw new Error(`${res.status} ${res.statusText}`);
+    // }
     const data = await res.json();
     console.log(`Successfully created new fragment with ID ${data.id}`, { data });
-    //return data;
+    return data;
   } catch (err) {
     console.error(`Unable to call POST /v1/fragment`, { err });
   }
 }
+
+export async function deleteFragment(fragmentId) {}
