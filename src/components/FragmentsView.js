@@ -64,6 +64,7 @@ function FragmentsAccordion({ user }) {
   };
 
   const editFragment = async (fragmentId, fragmentContent) => {
+    const data = await updateFragment(user, fragmentId, fragmentContent, showEditModal.type);
 
     if (data) {
       if (fragmentDetails[fragmentId]) {
