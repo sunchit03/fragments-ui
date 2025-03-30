@@ -3,7 +3,7 @@ import { Accordion, Spinner, Stack } from 'react-bootstrap';
 import { TfiTrash } from 'react-icons/tfi';
 import { GrFormView } from 'react-icons/gr';
 import toast, { Toaster } from 'react-hot-toast';
-import { getUserFragments, getFragmentInfo } from '../api';
+import { getUserFragments, getFragmentInfo, deleteFragment, getFragmentData } from '../api';
 import DeleteFragmentView from './DeleteFragmentView';
 import EditFragmentView from './EditFragmentView';
 
@@ -41,14 +41,19 @@ function FragmentsAccordion({ user }) {
     }
   }, []);
 
-  const deleteFragment = async (fragmentId) => {
-    //incomplete
-    setFragments((prevFragments) =>
-      prevFragments.filter((prevFragment) => prevFragment.id !== fragmentId)
-    );
+  const removeFragment = async (fragmentId) => {
+    const data = await deleteFragment(user, fragmentId);
+
+    if (data) {
+      setFragments((prevFragments) =>
+        prevFragments.filter((prevFragment) => prevFragment !== fragmentId)
+      );
+      toast.success(`Fragment ${fragmentId} deleted successfully!`);
+    } else {
+      toast.error('Error deleting fragment.');
+    }
 
     setShowDeleteModal({ show: false, fragmentId: null });
-    toast.success(`Fragment ${fragmentId} deleted successfully`);
   };
 
   const editFragment = async (fragmentId, data) => {
@@ -119,7 +124,7 @@ function FragmentsAccordion({ user }) {
         <DeleteFragmentView
           fragmentId={showDeleteModal.fragmentId}
           setShowDeleteModal={setShowDeleteModal}
-          deleteFragment={deleteFragment}
+          removeFragment={removeFragment}
         />
       )}
 
