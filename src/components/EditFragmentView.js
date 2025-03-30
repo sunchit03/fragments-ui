@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Dropdown, Form, Modal, SplitButton } from 'react-bootstrap';
-import { getFragmentData, getFragmentInfo } from '../api';
+import { Button, Form, Modal } from 'react-bootstrap';
+import { getFragmentData } from '../api';
 import toast, { Toaster } from 'react-hot-toast';
 import Papa from 'papaparse';
 const yaml = require('js-yaml');
 
 const notify = (message) => toast.error(message);
 
-function EditFragmentView({ user, fragmentId, setShowEditModal, editFragment }) {
+function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragment }) {
   const [fragmentContent, setFragmentContent] = useState('');
-  const [type, setType] = useState(''); // text/plain, text/markdown, text/html, text/csv, application/json, application/yaml
 
   const fetchFragmentData = async () => {
     const data = await getFragmentData(user, fragmentId);
-    const info = await getFragmentInfo(user, fragmentId);
     if (data) {
       setFragmentContent(data);
-    }
-    if (info.fragment) {
-      setType(info.fragment.type);
     }
   };
 
@@ -74,49 +69,23 @@ function EditFragmentView({ user, fragmentId, setShowEditModal, editFragment }) 
       return;
     }
 
-    editFragment(fragmentId);
-
-    // Clear input after successful submission
-    setFragmentContent('');
+    editFragment(fragmentId, fragmentContent);
   };
 
   return (
     <>
       {/* Edit Modal */}
-      <Modal show={true} onHide={() => setShowEditModal({ show: false, fragmentId: null })}>
+      <Modal
+        show={true}
+        onHide={() => setShowEditModal({ show: false, fragmentId: null, type: null })}
+      >
         <Modal.Header closeButton>
           <Modal.Title>Edit Fragment</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <Form>
             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
-              <Form.Label>Fragment {fragmentId}</Form.Label>
-              <SplitButton
-                key={'right'}
-                id={`dropdown-button-drop-right`}
-                drop={'right'}
-                variant="secondary"
-                title={`Selected Type: ${type}`}
-              >
-                <Dropdown.Item onClick={() => setType('text/plain')}>
-                  Plain Text (.txt)
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => setType('text/markdown')}>
-                  Markdown (.md, .html, .txt)
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => setType('text/html')}>
-                  HTML (.html, .txt)
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => setType('text/csv')}>
-                  CSV (.csv, .txt, .json)
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => setType('application/json')}>
-                  JSON (.json, .yaml, .yml, .txt)
-                </Dropdown.Item>
-                <Dropdown.Item onClick={() => setType('application/yaml')}>
-                  YAML (.yaml, .txt)
-                </Dropdown.Item>
-              </SplitButton>
+              <Form.Label>Fragment ID: {fragmentId}</Form.Label>
               <br /> <br />
               <Form.Control
                 as="textarea"
@@ -132,10 +101,10 @@ function EditFragmentView({ user, fragmentId, setShowEditModal, editFragment }) 
             variant="secondary"
             onClick={() => setShowEditModal({ show: false, fragmentId: null })}
           >
-            Close
+            Cancel
           </Button>
           <Button variant="primary" onClick={() => handleFragmentUpdate()}>
-            Yes
+            Edit
           </Button>
         </Modal.Footer>
       </Modal>

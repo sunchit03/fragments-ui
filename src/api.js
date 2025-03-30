@@ -99,6 +99,31 @@ export async function createNewFragment(user, fragmentData, contentType) {
   }
 }
 
+export async function updateFragment(user, fragmentId, fragmentData, contentType) {
+  console.log('Requesting user fragments data...');
+  try {
+    const res = await fetch(`${apiUrl}/v1/fragments/${fragmentId}`, {
+      // Generate headers with the proper Authorization bearer token to pass.
+      // We are using the `authorizationHeaders()` helper method we defined
+      // earlier, to automatically attach the user's ID token.
+      method: 'PUT',
+      headers: {
+        Authorization: `Bearer ${user.id_token}`,
+        'Content-Type': contentType,
+      },
+      body: fragmentData,
+    });
+    // if (!res.ok) {
+    //   throw new Error(`${res.status} ${res.statusText}`);
+    // }
+    const data = await res.json();
+    console.log(`Successfully updated fragment with ID ${data.fragment.id}`, { data });
+    return data;
+  } catch (err) {
+    console.error(`Unable to call PUT /v1/fragment`, { err });
+  }
+}
+
 export async function deleteFragment(user, fragmentId) {
   console.log(`Deleting fragment with ID ${fragmentId}...`);
   try {
