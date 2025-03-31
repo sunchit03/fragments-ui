@@ -45,6 +45,7 @@ function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragme
 
   useEffect(() => {
     fetchFragmentData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleFragmentUpdate = async () => {

@@ -53,6 +53,7 @@ function FragmentsView({ user }) {
     if (user) {
       fetchFragments();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const removeFragment = async (fragmentId) => {

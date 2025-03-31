@@ -23,6 +23,7 @@ function ConvertFragmentView({ fragmentId, type, setShowConversionModal, convert
 
   useEffect(() => {
     setConversionTypes(conversions[type]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [type]);
 
   const handleFragmentConversion = async (conversionType) => {
