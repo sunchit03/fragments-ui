@@ -1,21 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Form, Modal } from 'react-bootstrap';
+import { Button, Form, Image, Modal } from 'react-bootstrap';
 import { getFragmentData } from '../api';
 import toast, { Toaster } from 'react-hot-toast';
-import Papa from 'papaparse';
-const yaml = require('js-yaml');
+import { useDropzone } from 'react-dropzone';
 import { acceptedTypes, validator } from '../validator';
 
 const notify = (message) => toast.error(message);
 
 function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragment }) {
   const [fragmentContent, setFragmentContent] = useState('');
+  const [imageSrc, setImageSrc] = useState(null);
+  const [isImgUploaded, setIsImgUploaded] = useState({ uploaded: false, preview: null });
 
   const { getRootProps, getInputProps } = useDropzone({
     maxFiles: 1,
     accept: acceptedTypes[type] ? { [type]: acceptedTypes[type] } : {},
     onDrop: (acceptedFiles) => {
       if (type && type.startsWith('image/')) {
+        setIsImgUploaded({ uploaded: true, preview: URL.createObjectURL(acceptedFiles[0]) });
+        setFragmentContent(acceptedFiles[0]);
       } else {
         const reader = new FileReader();
         reader.onload = (e) => setFragmentContent(e.target.result);
@@ -28,6 +31,9 @@ function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragme
     const data = await getFragmentData(user, fragmentId);
     if (data) {
       if (type.startsWith('image/')) {
+        console.log(data);
+        const url = URL.createObjectURL(data);
+        setImageSrc(url);
       } else {
         setFragmentContent(data);
       }
@@ -42,10 +48,13 @@ function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragme
   }, []);
 
   const handleFragmentUpdate = async () => {
+    if (!type.startsWith('image/') && !fragmentContent.trim() && !isImgUploaded.uploaded) {
       notify('Fragment cannot be empty');
       return;
     }
 
+    if (type.startsWith('image/') && !isImgUploaded.uploaded) {
+      notify('Please upload an image');
       return;
     }
 
@@ -98,6 +107,17 @@ function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragme
                 />
               ) : (
                 <div className="d-flex flex-column align-items-center justify-content-center">
+                  {imageSrc && (
+                    <Image
+                      src={isImgUploaded.uploaded ? isImgUploaded.preview : imageSrc}
+                      onLoad={() => {
+                        URL.revokeObjectURL(
+                          isImgUploaded.uploaded ? isImgUploaded.preview : imageSrc
+                        );
+                      }}
+                      fluid
+                    />
+                  )}
                 </div>
               )}
             </Form.Group>

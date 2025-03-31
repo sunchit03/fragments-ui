@@ -27,6 +27,7 @@ export async function getUserFragments(user, expanded = false) {
     return data;
   } catch (err) {
     console.error('Unable to call GET /v1/fragment', { err });
+    return null;
   }
 }
 
@@ -44,11 +45,19 @@ export async function getFragmentData(user, fragmentId) {
     if (!res.ok) {
       throw new Error(`${res.status} ${res.statusText}`);
     }
-    const data = await res.text();
+
+    const contentType = res.headers.get('Content-Type');
+    let data;
+    if (contentType.startsWith('image/')) {
+      data = await res.blob();
+    } else {
+      data = await res.text();
+    }
     console.log(`Successfully got details for fragment with ID ${fragmentId}`, { data });
     return data;
   } catch (err) {
     console.error(`Unable to call GET /v1/fragment/${fragmentId}`, { err });
+    return null;
   }
 }
 
@@ -71,6 +80,7 @@ export async function getFragmentInfo(user, fragmentId) {
     return data;
   } catch (err) {
     console.error(`Unable to call GET /v1/fragment/${fragmentId}/info`, { err });
+    return null;
   }
 }
 
@@ -96,6 +106,7 @@ export async function createNewFragment(user, fragmentData, contentType) {
     return data;
   } catch (err) {
     console.error(`Unable to call POST /v1/fragment`, { err });
+    return null;
   }
 }
 
@@ -121,6 +132,7 @@ export async function updateFragment(user, fragmentId, fragmentData, contentType
     return data;
   } catch (err) {
     console.error(`Unable to call PUT /v1/fragment`, { err });
+    return null;
   }
 }
 
@@ -144,5 +156,6 @@ export async function deleteFragment(user, fragmentId) {
     return data;
   } catch (err) {
     console.error(`Unable to call DELETE /v1/fragment/${fragmentId}`, { err });
+    return null;
   }
 }
