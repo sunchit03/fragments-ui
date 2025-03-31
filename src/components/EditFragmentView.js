@@ -4,16 +4,36 @@ import { getFragmentData } from '../api';
 import toast, { Toaster } from 'react-hot-toast';
 import Papa from 'papaparse';
 const yaml = require('js-yaml');
+import { acceptedTypes, validator } from '../validator';
 
 const notify = (message) => toast.error(message);
 
 function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragment }) {
   const [fragmentContent, setFragmentContent] = useState('');
 
+  const { getRootProps, getInputProps } = useDropzone({
+    maxFiles: 1,
+    accept: acceptedTypes[type] ? { [type]: acceptedTypes[type] } : {},
+    onDrop: (acceptedFiles) => {
+      if (type && type.startsWith('image/')) {
+      } else {
+        const reader = new FileReader();
+        reader.onload = (e) => setFragmentContent(e.target.result);
+        reader.readAsText(acceptedFiles[0]);
+      }
+    },
+  });
+
   const fetchFragmentData = async () => {
     const data = await getFragmentData(user, fragmentId);
     if (data) {
-      setFragmentContent(data);
+      if (type.startsWith('image/')) {
+      } else {
+        setFragmentContent(data);
+      }
+    } else {
+      setFragmentContent('');
+      setImageSrc(null);
     }
   };
 
@@ -21,51 +41,17 @@ function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragme
     fetchFragmentData();
   }, []);
 
-  const validateJSON = (data) => {
-    try {
-      JSON.parse(data);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
-
-  const validateCSV = (content) => {
-    const { data, errors } = Papa.parse(content, { skipEmptyLines: true });
-
-    if (errors.length > 0 || data.length === 0) {
-      return false;
-    }
-    return true;
-  };
-
-  const validateYAML = (input) => {
-    try {
-      yaml.load(input);
-      return true;
-    } catch (e) {
-      return false;
-    }
-  };
-
-  const handleFragmentUpdate = () => {
-    if (!fragmentContent.trim()) {
+  const handleFragmentUpdate = async () => {
       notify('Fragment cannot be empty');
       return;
     }
 
-    if (type === 'application/json' && !validateJSON(fragmentContent)) {
-      notify('Please enter a valid JSON');
       return;
     }
 
-    if (type === 'text/csv' && !validateCSV(fragmentContent)) {
-      notify('Invalid CSV format');
-      return;
-    }
-
-    if (type === 'application/yaml' && !validateYAML(fragmentContent)) {
-      notify('Invalid YAML format');
+    const validate = validator(type, fragmentContent);
+    if (!(await validate).success) {
+      notify((await validate).message);
       return;
     }
 
@@ -87,12 +73,33 @@ function EditFragmentView({ user, fragmentId, type, setShowEditModal, editFragme
             <Form.Group className="mb-3" controlId="exampleForm.ControlTextarea1">
               <Form.Label>Fragment ID: {fragmentId}</Form.Label>
               <br /> <br />
-              <Form.Control
-                as="textarea"
-                rows={3}
-                value={fragmentContent}
-                onChange={(e) => setFragmentContent(e.target.value)}
-              />
+              {/* Drag & Drop Zone */}
+              <div
+                {...getRootProps()}
+                style={{
+                  border: '2px dashed #ccc',
+                  padding: '20px',
+                  textAlign: 'center',
+                  cursor: 'pointer',
+                  marginBottom: '10px',
+                }}
+              >
+                <input {...getInputProps()} />
+                Drag & drop your file here, or click to select one.
+              </div>
+              <br />
+              {!type.startsWith('image/') ? (
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  value={fragmentContent}
+                  onChange={(e) => setFragmentContent(e.target.value)}
+                  required
+                />
+              ) : (
+                <div className="d-flex flex-column align-items-center justify-content-center">
+                </div>
+              )}
             </Form.Group>
           </Form>
         </Modal.Body>
