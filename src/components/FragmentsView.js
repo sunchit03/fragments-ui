@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Accordion, Spinner, Stack } from 'react-bootstrap';
 import { TfiTrash } from 'react-icons/tfi';
 import { GrFormView } from 'react-icons/gr';
+import { SiConvertio } from 'react-icons/si';
 import toast, { Toaster } from 'react-hot-toast';
 import {
   getUserFragments,
@@ -12,14 +13,20 @@ import {
 } from '../api';
 import DeleteFragmentView from './DeleteFragmentView';
 import EditFragmentView from './EditFragmentView';
+import ConvertFragmentView from './ConvertFragmentView';
 
-function FragmentsAccordion({ user }) {
+function FragmentsView({ user }) {
   const [fragments, setFragments] = useState([]); // Holds only IDs
   const [fragmentDetails, setFragmentDetails] = useState({}); // Holds full fragment info
   const [loadingFragments, setLoadingFragments] = useState({}); // Tracks loading state
   const [selectedFragment, setSelectedFragment] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState({ show: false, fragmentId: null });
   const [showEditModal, setShowEditModal] = useState({ show: false, fragmentId: null, type: null });
+  const [showConversionModal, setShowConversionModal] = useState({
+    show: false,
+    fragmentId: null,
+    type: null,
+  });
 
   const fetchFragments = async () => {
     const userFragments = await getUserFragments(user);
@@ -100,9 +107,18 @@ function FragmentsAccordion({ user }) {
     if (modal === 'edit') {
       setShowEditModal({ show: true, fragmentId, type });
     } else {
+      setShowConversionModal({ show: true, fragmentId, type });
     }
   };
 
+  const convertFragment = async (fragmentId, extension) => {
+    const data = await getFragmentData(user, fragmentId + extension);
+    if (data) {
+      return data;
+    } else {
+      toast.error('Error converting fragment');
+      return null;
+    }
   };
 
   return (
@@ -139,6 +155,17 @@ function FragmentsAccordion({ user }) {
                     >
                       <GrFormView />
                     </div>
+
+                    <div
+                      className="p-2"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openModal(fragmentId, 'conversion');
+                      }}
+                    >
+                      <SiConvertio />
+                    </div>
+
                     <div
                       className="p-2"
                       onClick={(e) => {
@@ -184,8 +211,18 @@ function FragmentsAccordion({ user }) {
           editFragment={editFragment}
         />
       )}
+
+      {showConversionModal.show && (
+        <ConvertFragmentView
+          user={user}
+          fragmentId={showConversionModal.fragmentId}
+          type={showConversionModal.type}
+          setShowConversionModal={setShowConversionModal}
+          convertFragment={convertFragment}
+        />
+      )}
     </div>
   );
 }
 
-export default FragmentsAccordion;
+export default FragmentsView;

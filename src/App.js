@@ -3,7 +3,7 @@
 import { useAuth } from 'react-oidc-context';
 import MyNavbar from './components/MyNavbar';
 import { useState } from 'react';
-import UserFragmentsAccordion from './components/FragmentsView';
+import FragmentsView from './components/FragmentsView';
 import CreateFragmentView from './components/CreateFragmentView';
 
 function App() {
@@ -42,7 +42,7 @@ function App() {
       )}
       {view === 'fragmentsView' && (
         <section id="fragmentsView">
-          <UserFragmentsAccordion user={auth.user} />
+          <FragmentsView user={auth.user} />
         </section>
       )}
       {view === 'createFragmentsView' && (
