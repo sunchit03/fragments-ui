@@ -17,6 +17,7 @@ function CreateFragmentView({ user }) {
   const [isImgUploaded, setIsImgUploaded] = useState({ uploaded: false, preview: null });
 
   const dropDownOptions = {
+    'text/plain': 'Plain Text (.txt)',
     'text/markdown': 'Markdown (.md)',
     'text/html': 'HTML (.html)',
     'text/csv': 'CSV (.csv)',
@@ -34,7 +35,11 @@ function CreateFragmentView({ user }) {
     accept: acceptedTypes[type] ? { [type]: acceptedTypes[type] } : {},
     onDrop: (acceptedFiles) => {
       if (type && type.startsWith('image/')) {
+        setIsImgUploaded({ uploaded: true, preview: URL.createObjectURL(acceptedFiles[0]) });
+        setFragmentContent(acceptedFiles[0]);
       } else {
+        const reader = new FileReader();
+        reader.onload = (e) => setFragmentContent(e.target.result);
         reader.readAsText(acceptedFiles[0]);
       }
     },
@@ -49,9 +54,13 @@ function CreateFragmentView({ user }) {
       return;
     }
 
+    if (!type.startsWith('image/') && !fragmentContent.trim() && !isImgUploaded.uploaded) {
+      notify('Fragment cannot be empty');
       return;
     }
 
+    if (type.startsWith('image/') && !isImgUploaded.uploaded) {
+      notify('Please upload an image');
       return;
     }
 
@@ -73,6 +82,7 @@ function CreateFragmentView({ user }) {
 
     // Clear input after successful submission
     setFragmentContent('');
+    setIsImgUploaded({ uploaded: false, preview: null });
   };
 
   return (
@@ -144,6 +154,13 @@ function CreateFragmentView({ user }) {
 
           {type && type.startsWith('image') && isImgUploaded.uploaded && (
             <div className="d-flex flex-column align-items-center justify-content-center">
+              <Image
+                src={isImgUploaded.preview}
+                onLoad={() => {
+                  URL.revokeObjectURL(isImgUploaded.preview);
+                }}
+                fluid
+              />
             </div>
           )}
         </Form.Group>
