@@ -5,6 +5,7 @@ import MyNavbar from './components/MyNavbar';
 import { useState } from 'react';
 import FragmentsView from './components/FragmentsView';
 import CreateFragmentView from './components/CreateFragmentView';
+import SearchFragmentsView from './components/SearchFragmentsView';
 
 function App() {
   const auth = useAuth();
@@ -48,6 +49,11 @@ function App() {
       {view === 'createFragmentsView' && (
         <section id="fragmentsCreate">
           <CreateFragmentView user={auth.user} />
+        </section>
+      )}
+      {view === 'searchFragmentsView' && (
+        <section id="fragmentsSearch">
+          <SearchFragmentsView user={auth.user} />
         </section>
       )}
     </div>

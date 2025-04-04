@@ -28,6 +28,12 @@ function MyNavbar({ auth, view, setView }) {
                   Create Fragments
                 </Nav.Link>
                 <Nav.Link
+                  active={view === 'searchFragmentsView'}
+                  onClick={() => setView('searchFragmentsView')}
+                >
+                  Search Fragments
+                </Nav.Link>
+                <Nav.Link
                   onClick={() => {
                     void auth.removeUser();
                     setView('homeView');
