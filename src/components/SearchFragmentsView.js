@@ -9,11 +9,11 @@ import FragmentsView from './FragmentsView';
 const notify = (message) => toast.error(message);
 
 function SearchFragmentsView({ user }) {
-  const [fragmentId, setFragmentId] = useState(null);
   const [type, setType] = useState(null); // text/plain, text/markdown, text/html, text/csv, application/json, application/yaml
   const [minSize, setMinSize] = useState(null);
   const [maxSize, setMaxSize] = useState(null);
-  const [radioValue, setRadioValue] = useState('any');
+  const [minDate, setMinDate] = useState(null);
+  const [maxDate, setMaxDate] = useState(null);
   const [query, setQuery] = useState(null);
 
   const [isSearchValid, setIsSearchValid] = useState(false);
@@ -34,23 +34,17 @@ function SearchFragmentsView({ user }) {
 
   const handleTypeSelect = (event) => {
     if (event.target.value) {
-      setType(dropDownOptions[event.target.value]);
+      setType(event.target.value);
     } else {
       setType(null);
     }
   };
 
-  const handleRadioSelect = (event) => {
-    setRadioValue(event.target.value);
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-
+  const handleSubmit = () => {
+    console.log('clickedd');
     setIsSearchValid(false);
 
-    if (!(type || fragmentId || minSize || maxSize)) {
+    if (!(type || minSize || maxSize || minDate || maxDate)) {
       notify('Please enter at least one parameter');
       return;
     }
@@ -70,12 +64,17 @@ function SearchFragmentsView({ user }) {
       return;
     }
 
+    if (minDate && maxDate && minDate > maxDate) {
+      notify('Minimum date must be lower than maximum date');
+      return;
+    }
+
     setQuery({
-      fragmentId,
       type,
       minSize,
       maxSize,
-      radioValue,
+      minDate: minDate ? new Date(minDate).toISOString() : null,
+      maxDate: maxDate ? new Date(maxDate).toISOString() : null,
     });
 
     setIsSearchValid(true);
@@ -84,18 +83,8 @@ function SearchFragmentsView({ user }) {
   return (
     <>
       <div className="p-3" key={'inline-radio'}>
-        <Form onSubmit={handleSubmit}>
+        <Form>
           <Row className="mb-3">
-            <Form.Group as={Col} controlId="formFragmentId">
-              <Form.Label>ID</Form.Label>
-              <Form.Control
-                type="text"
-                value={fragmentId}
-                onChange={(e) => setFragmentId(e.target.value)}
-                placeholder="Enter Fragment ID"
-              />
-            </Form.Group>
-
             <Form.Group as={Col} controlId="formGridType">
               <Form.Label>Type</Form.Label>
               <Form.Select defaultValue="None" onChange={handleTypeSelect}>
@@ -129,28 +118,27 @@ function SearchFragmentsView({ user }) {
             </Form.Group>
           </Row>
 
-          <div key={`inline-radio`} className="mb-3">
-            <Form.Check
-              type="radio"
-              label="Match any of the following"
-              name="anyOrOnly"
-              id="anyRadio"
-              value={'any'}
-              checked={radioValue === 'any'}
-              onChange={handleRadioSelect}
-            />
-            <Form.Check
-              type="radio"
-              label="Match all of the following"
-              name="anyOrOnly"
-              id="onlyRadio"
-              value={'only'}
-              checked={radioValue === 'only'}
-              onChange={handleRadioSelect}
-            />
-          </div>
+          <Row className="mb-3">
+            <Form.Group as={Col} controlId="formGridMinDate">
+              <Form.Label>Minimum Creation Date</Form.Label>
+              <Form.Control
+                type="date"
+                value={minDate}
+                onChange={(e) => setMinDate(e.target.value)}
+              />
+            </Form.Group>
 
-          <Button variant="primary" type="submit">
+            <Form.Group as={Col} controlId="formGridMaxDate">
+              <Form.Label>Maximum Creation Date</Form.Label>
+              <Form.Control
+                type="date"
+                value={maxDate}
+                onChange={(e) => setMaxDate(e.target.value)}
+              />
+            </Form.Group>
+          </Row>
+
+          <Button variant="primary" onClick={handleSubmit}>
             Submit
           </Button>
         </Form>
