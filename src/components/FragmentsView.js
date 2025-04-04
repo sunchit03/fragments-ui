@@ -15,7 +15,7 @@ import DeleteFragmentView from './DeleteFragmentView';
 import EditFragmentView from './EditFragmentView';
 import ConvertFragmentView from './ConvertFragmentView';
 
-function FragmentsView({ user }) {
+function FragmentsView({ user, query = null }) {
   const [fragments, setFragments] = useState([]); // Holds only IDs
   const [fragmentDetails, setFragmentDetails] = useState({}); // Holds full fragment info
   const [loadingFragments, setLoadingFragments] = useState({}); // Tracks loading state
@@ -29,7 +29,15 @@ function FragmentsView({ user }) {
   });
 
   const fetchFragments = async () => {
-    const userFragments = await getUserFragments(user);
+    let userFragments;
+
+    if (query) {
+      console.log(query);
+      userFragments = await getUserFragments(user, false, query);
+      console.log(userFragments);
+    } else {
+      userFragments = await getUserFragments(user);
+    }
 
     if (userFragments && Array.isArray(userFragments.fragments)) {
       setFragments(userFragments.fragments);
@@ -54,7 +62,7 @@ function FragmentsView({ user }) {
       fetchFragments();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [query]);
 
   const removeFragment = async (fragmentId) => {
     const data = await deleteFragment(user, fragmentId);
@@ -124,7 +132,13 @@ function FragmentsView({ user }) {
 
   return (
     <div>
-      <h2>Your Fragments</h2>
+      {!query && <h2>Your Fragments</h2>}
+
+      <div className="w-100 d-flex flex-column align-items-center justify-content-center">
+        {!query && fragments.length === 0 && <p>No fragments, add one?</p>}
+
+        {query && fragments.length === 0 && <p>No fragments found</p>}
+      </div>
 
       <Accordion>
         {fragments.map((fragmentId) => {
