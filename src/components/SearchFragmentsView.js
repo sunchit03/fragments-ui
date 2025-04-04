@@ -55,6 +55,21 @@ function SearchFragmentsView({ user }) {
       return;
     }
 
+    if (minSize && minSize < 1) {
+      notify('Minimum size must be greater than or equal to 1');
+      return;
+    }
+
+    if (maxSize && maxSize < 1) {
+      notify('Maximum size must be greater than or equal to 1');
+      return;
+    }
+
+    if (minSize && maxSize && minSize > maxSize) {
+      notify('Minimum size must be lower than maximum size');
+      return;
+    }
+
     setQuery({
       fragmentId,
       type,
@@ -97,12 +112,20 @@ function SearchFragmentsView({ user }) {
           <Row className="mb-3">
             <Form.Group as={Col} controlId="formGridMinSize">
               <Form.Label>Minimum Size</Form.Label>
-              <Form.Control type="number" min={1} />
+              <Form.Control
+                type="number"
+                value={minSize}
+                onChange={(e) => setMinSize(e.target.value)}
+              />
             </Form.Group>
 
             <Form.Group as={Col} controlId="formGridMaxSize">
               <Form.Label>Maximum Size</Form.Label>
-              <Form.Control type="number" min={1} />
+              <Form.Control
+                type="number"
+                value={maxSize}
+                onChange={(e) => setMaxSize(e.target.value)}
+              />
             </Form.Group>
           </Row>
 
