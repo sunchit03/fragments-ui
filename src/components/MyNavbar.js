@@ -4,7 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 
 function MyNavbar({ auth, view, setView }) {
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
+    <Navbar expand="lg" className="bg-body-tertiary" fixed="top">
       <Container>
         <Navbar.Brand>Fragments App</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -26,6 +26,12 @@ function MyNavbar({ auth, view, setView }) {
                   onClick={() => setView('createFragmentsView')}
                 >
                   Create Fragments
+                </Nav.Link>
+                <Nav.Link
+                  active={view === 'searchFragmentsView'}
+                  onClick={() => setView('searchFragmentsView')}
+                >
+                  Search Fragments
                 </Nav.Link>
                 <Nav.Link
                   onClick={() => {

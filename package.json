@@ -53,6 +53,12 @@
     ]
   },
   "devDependencies": {
+    "html-validate": "^9.5.2",
     "prettier": "3.4.2"
+  },
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
   }
 }

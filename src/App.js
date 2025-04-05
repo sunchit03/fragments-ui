@@ -3,13 +3,15 @@
 import { useAuth } from 'react-oidc-context';
 import MyNavbar from './components/MyNavbar';
 import { useState } from 'react';
-import UserFragmentsAccordion from './components/FragmentsView';
+import FragmentsView from './components/FragmentsView';
 import CreateFragmentView from './components/CreateFragmentView';
+import SearchFragmentsView from './components/SearchFragmentsView';
 
 function App() {
   const auth = useAuth();
 
   const [view, setView] = useState('homeView');
+  const spacing = 80;
 
   // eslint-disable-next-line default-case
   switch (auth.activeNavigator) {
@@ -35,19 +37,24 @@ function App() {
       </section>
       {view === 'homeView' && (
         <section id="user">
-          <h2>
+          <h2 style={{ marginTop: spacing + 'px' }}>
             Hello <span className="username">{auth.user?.profile['cognito:username']}</span>!
           </h2>
         </section>
       )}
       {view === 'fragmentsView' && (
         <section id="fragmentsView">
-          <UserFragmentsAccordion user={auth.user} />
+          <FragmentsView user={auth.user} />
         </section>
       )}
       {view === 'createFragmentsView' && (
         <section id="fragmentsCreate">
           <CreateFragmentView user={auth.user} />
+        </section>
+      )}
+      {view === 'searchFragmentsView' && (
+        <section id="fragmentsSearch">
+          <SearchFragmentsView user={auth.user} />
         </section>
       )}
     </div>

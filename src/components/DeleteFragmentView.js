@@ -1,8 +1,8 @@
 import { Button, Modal } from 'react-bootstrap';
 
-function DeleteFragmentView({ fragmentId, setShowDeleteModal, deleteFragment }) {
+function DeleteFragmentView({ fragmentId, setShowDeleteModal, removeFragment }) {
   const handleFragmentDeletion = () => {
-    deleteFragment(fragmentId);
+    removeFragment(fragmentId);
   };
 
   return (
@@ -18,10 +18,10 @@ function DeleteFragmentView({ fragmentId, setShowDeleteModal, deleteFragment }) 
             variant="secondary"
             onClick={() => setShowDeleteModal({ show: false, fragmentId: null })}
           >
-            Close
+            Cancel
           </Button>
-          <Button variant="primary" onClick={() => handleFragmentDeletion(fragmentId)}>
-            Yes
+          <Button variant="primary" onClick={handleFragmentDeletion}>
+            Delete
           </Button>
         </Modal.Footer>
       </Modal>
