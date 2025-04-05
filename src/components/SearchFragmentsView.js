@@ -9,14 +9,14 @@ import FragmentsView from './FragmentsView';
 const notify = (message) => toast.error(message);
 
 function SearchFragmentsView({ user }) {
-  const [type, setType] = useState(null); // text/plain, text/markdown, text/html, text/csv, application/json, application/yaml
+  const [type, setType] = useState('None'); // text/plain, text/markdown, text/html, text/csv, application/json, application/yaml
   const [minSize, setMinSize] = useState(null);
   const [maxSize, setMaxSize] = useState(null);
   const [minDate, setMinDate] = useState(null);
   const [maxDate, setMaxDate] = useState(null);
   const [query, setQuery] = useState(null);
-
   const [isSearchValid, setIsSearchValid] = useState(false);
+  const spacing = 60;
 
   const dropDownOptions = {
     'text/plain': 'Plain Text (.txt)',
@@ -41,10 +41,9 @@ function SearchFragmentsView({ user }) {
   };
 
   const handleSubmit = () => {
-    console.log('clickedd');
     setIsSearchValid(false);
 
-    if (!(type || minSize || maxSize || minDate || maxDate)) {
+    if (type === 'None' && !(minSize || maxSize || minDate || maxDate)) {
       notify('Please enter at least one parameter');
       return;
     }
@@ -70,7 +69,7 @@ function SearchFragmentsView({ user }) {
     }
 
     setQuery({
-      type,
+      type: type === 'None' ? null : type,
       minSize,
       maxSize,
       minDate: minDate ? new Date(minDate).toISOString() : null,
@@ -82,7 +81,7 @@ function SearchFragmentsView({ user }) {
 
   return (
     <>
-      <div className="p-3" key={'inline-radio'}>
+      <div className="p-3" key={'inline-radio'} style={{ marginTop: spacing + 'px' }}>
         <Form>
           <Row className="mb-3">
             <Form.Group as={Col} controlId="formGridType">

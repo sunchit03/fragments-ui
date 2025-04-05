@@ -27,6 +27,10 @@ function FragmentsView({ user, query = null }) {
     fragmentId: null,
     type: null,
   });
+  let spacing = 70;
+  if (query) {
+    spacing = 10;
+  }
 
   const fetchFragments = async () => {
     let userFragments;
@@ -131,8 +135,8 @@ function FragmentsView({ user, query = null }) {
   };
 
   return (
-    <div>
-      {!query && <h2>Your Fragments</h2>}
+    <div style={{ marginTop: spacing + 'px' }}>
+      {!query && <h3>Your Fragments</h3>}
 
       <div className="w-100 d-flex flex-column align-items-center justify-content-center">
         {!query && fragments.length === 0 && <p>No fragments, add one?</p>}

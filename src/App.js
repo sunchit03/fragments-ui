@@ -11,6 +11,7 @@ function App() {
   const auth = useAuth();
 
   const [view, setView] = useState('homeView');
+  const spacing = 80;
 
   // eslint-disable-next-line default-case
   switch (auth.activeNavigator) {
@@ -36,7 +37,7 @@ function App() {
       </section>
       {view === 'homeView' && (
         <section id="user">
-          <h2>
+          <h2 style={{ marginTop: spacing + 'px' }}>
             Hello <span className="username">{auth.user?.profile['cognito:username']}</span>!
           </h2>
         </section>

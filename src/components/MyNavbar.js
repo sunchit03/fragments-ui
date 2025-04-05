@@ -4,7 +4,7 @@ import Navbar from 'react-bootstrap/Navbar';
 
 function MyNavbar({ auth, view, setView }) {
   return (
-    <Navbar expand="lg" className="bg-body-tertiary">
+    <Navbar expand="lg" className="bg-body-tertiary" fixed="top">
       <Container>
         <Navbar.Brand>Fragments App</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

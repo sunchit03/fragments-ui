@@ -15,6 +15,7 @@ function CreateFragmentView({ user }) {
   const [type, setType] = useState(null); // text/plain, text/markdown, text/html, text/csv, application/json, application/yaml
   const [fragmentContent, setFragmentContent] = useState('');
   const [isImgUploaded, setIsImgUploaded] = useState({ uploaded: false, preview: null });
+  const spacing = 60;
 
   const dropDownOptions = {
     'text/plain': 'Plain Text (.txt)',
@@ -73,8 +74,8 @@ function CreateFragmentView({ user }) {
     // Call API to create the fragment
     const data = await createNewFragment(user, fragmentContent, type);
 
-    if (data.status !== 'ok') {
-      notify(`${data.error.message} (${data.error.code}) `);
+    if (!data) {
+      notify(`Error creating fragment`);
       return;
     }
 
@@ -87,7 +88,12 @@ function CreateFragmentView({ user }) {
 
   return (
     <>
-      <Form noValidate onSubmit={handleSubmit} className="p-3">
+      <Form
+        noValidate
+        onSubmit={handleSubmit}
+        className="p-3"
+        style={{ marginTop: spacing + 'px' }}
+      >
         <Form.Group className="mb-3">
           <Form.Label>Enter your fragment:</Form.Label>
           <br />
